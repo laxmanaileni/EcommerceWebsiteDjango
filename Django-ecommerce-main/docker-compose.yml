@@ -1,0 +1,37 @@
+version: "3.9"
+    
+services:
+  db:
+    image: mysql:5.7
+    volumes:
+      - db_data:/var/lib/mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: nav
+      MYSQL_DATABASE: ecommerce
+      MYSQL_USER: nav
+      MYSQL_PASSWORD: nav
+
+  ecommerce:
+    depends_on:
+      - db
+    build:
+      context: .
+    ports:
+      - "8000:8000"
+    restart: always
+    environment:
+      ECOMMMERCE_DB_HOST: db
+      ECOMMMERCE_DB_PORT: 3306
+      ECOMMMERCE_DB_USER: nav
+      ECOMMMERCE_DB_PASSWORD: nav
+      ECOMMMERCE_DB_NAME: ecommerce
+      # env variables for waiting for mysql port
+      WAIT_HOSTS: db:3306
+      WAIT_HOSTS_TIMEOUT: 300
+      WAIT_SLEEP_INTERVAL: 5
+      WAIT_HOST_CONNECT_TIMEOUT: 30
+    
+    command: sh -c "/usr/src/app/wait && /usr/src/app/run.sh"
+volumes:
+  db_data: {}
